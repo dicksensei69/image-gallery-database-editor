@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Gallery</title>
+  <style>
+    img {
+      width: 600px; /* Adjust as needed */
+      height: auto;
+    }
+    textarea {
+      width: 400px; /* Adjust as needed */
+      height: 200px; /* Adjust as needed */
+      font-size: 20px; /* Adjust as needed */
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>My Image Gallery</h1>
+
+  <input id="folder" type="text" placeholder="Enter folder path">
+  
+  <button id="loadButton">Load Gallery</button>
+
+  <div id="gallery"></div>
+
+  <script>
+    document.getElementById('loadButton').addEventListener('click', async () => {
+      const folder = document.getElementById('folder').value;
+      const response = await fetch(`/list-files?folder=${folder}`);
+      const data = await response.json();
+      console.log('Response from server:', data); // Log the response from the server
+      const { imageFiles, textFiles } = data;
+      if (!imageFiles) {
+        console.error('imageFiles is undefined!');
+        return;
+      }  
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      for (let i = 0; i < imageFiles.length; i++) {
+        //const imgSrc = `/${folder}/${imageFiles[i]}`;
+        //const textSrc = `/${folder}/${textFiles[i]}`;
+        const imgSrc = `/img/${imageFiles[i]}`;
+        const textSrc = `/img/${textFiles[i]}`;
+        const imgElement = document.createElement('img');
+        imgElement.src = imgSrc;
+        imgElement.classList.add('image'); // Add this line NEW NEW
+        const textElement = document.createElement('textarea');
+        textElement.value = await fetch(textSrc).then(res => res.text());
+        textElement.classList.add('text'); // Add this line NEW NEW
+        textElement.addEventListener('blur', () => {
+          fetch('/update-text', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: textSrc, text: textElement.value })
+          });
+        });
+        const divElement = document.createElement('div');
+        divElement.appendChild(imgElement);
+        divElement.appendChild(textElement);
+        gallery.appendChild(divElement);
+      }
+    });
+  </script>
+
+</body>
+</html>
