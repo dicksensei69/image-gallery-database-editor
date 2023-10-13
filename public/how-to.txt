@@ -1,0 +1,1 @@
+In this folder you want to sim link or drop your groups of images and text files.  They can be in their own folder and it all should work. Good luck!
