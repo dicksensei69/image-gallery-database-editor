@@ -11,6 +11,17 @@
       width: 400px; /* Adjust as needed */
       height: 200px; /* Adjust as needed */
       font-size: 20px; /* Adjust as needed */
+      background-color: #333;
+      color: #0f0; 
+      font-family: 'Courier New', monospace;
+    }
+    body {
+      background-color: #222; 
+      color: #eee;
+    }
+
+    h1 {
+      color: #fff;
     }
   </style>
 </head>
@@ -28,7 +39,7 @@
   <script>
     document.getElementById('loadButton').addEventListener('click', async () => {
       const folder = document.getElementById('folder').value;
-      const response = await fetch(`/list-files?folder=${folder}`);
+      const response = await fetch(`/list-files?folder=public/${folder}`); //I added public to the folder so I don't have to type public hopefully this fixes the error
       const data = await response.json();
       console.log('Response from server:', data); // Log the response from the server
       const { imageFiles, textFiles } = data;
@@ -41,19 +52,21 @@
       for (let i = 0; i < imageFiles.length; i++) {
         //const imgSrc = `/${folder}/${imageFiles[i]}`;
         //const textSrc = `/${folder}/${textFiles[i]}`;
-        const imgSrc = `/img/${imageFiles[i]}`;
-        const textSrc = `/img/${textFiles[i]}`;
+        const imgSrc = `/${folder}/${imageFiles[i]}`; //when this is set to img instead of folder everything works
+        const textSrc = `/${folder}/${textFiles[i]}`; //when this is set to img instead of folder everything works
         const imgElement = document.createElement('img');
         imgElement.src = imgSrc;
         imgElement.classList.add('image'); // Add this line NEW NEW
         const textElement = document.createElement('textarea');
         textElement.value = await fetch(textSrc).then(res => res.text());
         textElement.classList.add('text'); // Add this line NEW NEW
-        textElement.addEventListener('blur', () => {
+        textElement.addEventListener('input', () => {
           fetch('/update-text', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename: textSrc, text: textElement.value })
+            body: JSON.stringify({
+                filename: textSrc, 
+                text: textElement.value })
           });
         });
         const divElement = document.createElement('div');
