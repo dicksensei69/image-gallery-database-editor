@@ -12,7 +12,7 @@
       height: 200px; /* Adjust as needed */
       font-size: 20px; /* Adjust as needed */
       background-color: #333;
-      color: #0f0; 
+      color: #a393eb;
       font-family: 'Courier New', monospace;
     }
     body {
@@ -30,12 +30,52 @@
 
   <h1>My Image Gallery</h1>
 
+  <select id="theme">
+    <option value="green">Green Theme</option>
+    <option value="purple">Purple Theme</option>
+    <option value="blue">Blue Theme</option>
+  </select>
+
   <input id="folder" type="text" placeholder="Enter folder path">
   
   <button id="loadButton">Load Gallery</button>
-
+  
+  <input type="text" id="removeWords" placeholder="Words to remove">
+  
+  <button id="removeButton">Remove Words</button>
+  <button id="addStartButton">Add to Start</button>
+  <button id="addEndButton">Add to End</button>
   <div id="gallery"></div>
 
+  <script>
+
+  const themeSelect = document.getElementById('theme');
+
+  themeSelect.addEventListener('change', () => {
+      const theme = themeSelect.value;
+  
+      if (theme === 'green') {
+        // Apply green theme
+
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.style.color = '#0f0'; 
+        });
+      } else if (theme === 'purple') {  
+        // Apply purple theme
+
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.style.color = '#a393eb';
+        });
+      }
+      else if (theme === 'blue') {  
+        // Apply purple theme
+
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.style.color = '#79c2d0';
+        });
+      }
+  });
+  </script>
   <script>
     document.getElementById('loadButton').addEventListener('click', async () => {
       const folder = document.getElementById('folder').value;
@@ -76,6 +116,75 @@
       }
     });
   </script>
+  <script>
+const removeButton = document.getElementById('removeButton');
 
+removeButton.addEventListener('click', async () => {
+
+  const folderInput = document.getElementById('folder');
+  const folderValue = folderInput.value;  
+
+  const wordsToRemove = document.getElementById('removeWords').value.split(',');
+
+  await fetch('/remove-words?folder=public/' + folderValue, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ words: wordsToRemove })
+  });
+
+  document.getElementById('loadButton').click();
+});
+  </script>
+
+  <script>
+// Add start handler
+const addStartButton = document.getElementById('addStartButton');
+
+addStartButton.addEventListener('click', async () => {
+
+  const folderInput = document.getElementById('folder');
+  const folderValue = folderInput.value;  
+  //const words = wordsInput.value;
+
+  const wordsToAdd = document.getElementById('removeWords').value.split(',');
+  console.log('Words to add(index):', wordsToAdd);
+  await fetch('/add-start?folder=public/' + folderValue, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ words: wordsToAdd })
+  });
+
+  document.getElementById('loadButton').click();
+
+});
+</script>
+<script>
+// Add end handler
+const addEndButton = document.getElementById('addEndButton');
+
+addEndButton.addEventListener('click', async () => {
+
+  const folderInput = document.getElementById('folder');
+  const folderValue = folderInput.value;  
+  //const words = wordsInput.value;
+
+  const wordsToAdd = document.getElementById('removeWords').value.split(',');
+  console.log('Words to add(index):', wordsToAdd);
+  await fetch('/add-end?folder=public/' + folderValue, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ words: wordsToAdd })
+  });
+
+  document.getElementById('loadButton').click();
+
+});
+  </script>
 </body>
 </html>
